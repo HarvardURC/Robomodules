@@ -1,8 +1,7 @@
 import struct, asyncio
 from enum import Enum
 from .asyncProto import AsyncProto
-from robomodules.messages.subscribe_pb2 import Subscribe
-from robomodules.messages.types import message_buffers
+from robomodules.messages import *
 
 class AsyncClient(AsyncProto):
     def __init__(self, addr, port, cb, subscriptions, loop=None):

@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 
-import asyncio, os
-from modules.protoModule import ProtoModule
-from comm.constants import *
-from comm.mockMsg_pb2 import MockMsg
+import os
+import robomodules as rm
 
 ADDRESS = os.environ.get("BIND_ADDRESS","localhost")
 PORT = os.environ.get("BIND_PORT", 11297)
 
 FREQUENCY = 10
 
-class MockGuiModule(ProtoModule):
-    def __init__(self, loop):
-        super().__init__(loop, ADDRESS, PORT,[MsgType.MOCK_MSG])
+class MockGuiModule(rm.ProtoModule):
+    def __init__(self, addr, port):
+        super().__init__(addr, port, [rm.MsgType.MOCK_MSG])
         self.value = -1
         self.sub_ticks = 0
         self.subbed = True
 
     def msg_received(self, msg, msg_type):
         # This gets called whenever any message is received
-        if msg_type == MsgType.MOCK_MSG:
+        if msg_type == rm.MsgType.MOCK_MSG:
             self.value = msg.mockValue
 
     def tick(self):
@@ -34,18 +32,17 @@ class MockGuiModule(ProtoModule):
         if self.sub_ticks > 100:
             if self.subbed:
                 print('Unsubscribed!')
-                self.unsubscribe([MsgType.MOCK_MSG])
+                self.unsubscribe([rm.MsgType.MOCK_MSG])
             else:
                 print('Subscribed!')
-                self.subscribe([MsgType.MOCK_MSG])
+                self.subscribe([rm.MsgType.MOCK_MSG])
             self.subbed = not self.subbed
             self.sub_ticks = 0
         self.sub_ticks += 1
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    module = MockGuiModule(loop)
+    module = MockGuiModule(ADDRESS, PORT)
     module.run()
 
 if __name__ == "__main__":
