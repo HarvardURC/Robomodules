@@ -10,7 +10,8 @@ FREQUENCY = 2
 
 class MockSensorModule(rm.ProtoModule):
     def __init__(self, addr, port):
-        super().__init__(addr, port, [])
+        self.subscriptions = []
+        super().__init__(addr, port, self.subscriptions)
 
     def msg_received(self, msg, msg_type):
         # This gets called whenever any message is received

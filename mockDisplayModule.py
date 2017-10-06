@@ -10,7 +10,8 @@ FREQUENCY = 10
 
 class MockGuiModule(rm.ProtoModule):
     def __init__(self, addr, port):
-        super().__init__(addr, port, [rm.MsgType.MOCK_MSG])
+        self.subscriptions = [rm.MsgType.MOCK_MSG]
+        super().__init__(addr, port, self.subscriptions)
         self.value = -1
         self.sub_ticks = 0
         self.subbed = True
