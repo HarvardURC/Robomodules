@@ -1,11 +1,11 @@
 import asyncio
 from robomodules.comm.asyncClient import AsyncClient
-from robomodules.messages.subscribe_pb2 import Subscribe
+from robomodules.comm.subscribe_pb2 import Subscribe
 
 class ProtoModule:
-    def __init__(self, addr, port, subscriptions):
+    def __init__(self, addr, port, message_buffers, MsgType, subscriptions):
         self.loop = asyncio.get_event_loop()
-        self.client = AsyncClient(addr, port, self.msg_received, subscriptions, self.loop)
+        self.client = AsyncClient(addr, port, self.msg_received, message_buffers, MsgType, subscriptions, self.loop)
         self.loop.call_soon(self.tick)
 
     def tick(self):

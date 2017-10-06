@@ -1,4 +1,4 @@
-from .constants import *
+from .constants import _SUBSCRIBE, MAGIC_HEADER, SIZE_HEADER
 
 class UnavailableClient:
     def __init__(self, *args, **kwargs):
@@ -15,7 +15,10 @@ except ImportError:
     ServerProto = UnavailableClient
 
 def pack_msg(msg, msg_type):
-    header = SIZE_HEADER.pack(MAGIC_HEADER, msg_type.value, len(msg))
+    if msg_type == _SUBSCRIBE:
+        header = SIZE_HEADER.pack(MAGIC_HEADER, msg_type, len(msg))
+    else:
+        header = SIZE_HEADER.pack(MAGIC_HEADER, msg_type.value, len(msg))
     return header + msg
     
 __all__ = ['AsyncClient', 'ServerProto']
