@@ -1,6 +1,7 @@
 import asyncio
 from .constants import *
 from robomodules.comm import pack_msg
+from robomodules.messages import MsgType
 
 class AsyncProto(asyncio.Protocol):
     def __init__(self):
