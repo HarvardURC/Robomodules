@@ -1,7 +1,6 @@
 import asyncio
 from .constants import *
 from robomodules.comm import pack_msg
-from robomodules.messages import MsgType
 
 class AsyncProto(asyncio.Protocol):
     def __init__(self):
@@ -32,7 +31,7 @@ class AsyncProto(asyncio.Protocol):
                         self.loop.call_soon(self.connect)
                     return
             elif self.__length and len(self.__buffer) >= self.__length:
-                self.msg_received(self.__buffer[:self.__length], MsgType(self.__msg_type))
+                self.msg_received(self.__buffer[:self.__length], self.__msg_type)
                 self.__buffer = self.__buffer[self.__length:]
                 self.__length = 0
                 self.__msg_type = -1
