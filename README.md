@@ -261,7 +261,7 @@ if __name__ == "__main__":
 This is necessary to make the script easily executable.
 
 
-### mockDisplayModule
+### mockDisplayModule.py
 
 ```
 #!/usr/bin/env python3
