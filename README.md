@@ -12,9 +12,9 @@ The messaging system relies on messages, that are defined by the user using [Goo
 
 ## Documentation
 
-To create a Robomodules server, just make an instance of this class, passing in the address and port where you want to run the server as well as the enum class of message types.
-
 ### robomodules.Server
+
+To create a Robomodules server, just make an instance of this class, passing in the address and port where you want to run the server as well as the enum class of message types.
 
 #### __init_\_(self, addr, port, MsgType)
 
@@ -29,6 +29,7 @@ This function starts the server.
 This function stops the server.
 
 ### robomodules.ProtoModule
+To create a Robomodules module, make a new module class that inherits from `robomodules.ProtoModule`. Your module has to call the super classes `__init__` function as well as implement the `tick` and `msg_received` functions.
 
 ####  __init_\_(self, addr, port, message_buffers, MsgType, frequency=0, subscriptions=[], loop=None)
 
@@ -57,10 +58,10 @@ msg_types - a list of message types to subscribe to. The message types have to b
 
 msg_types - a list of message types to unsubscribe from. The message types have to be values of the `MsgType` enum class.
 
-
 #### set_frequency(self, frequency)
 
 Sets the frequency (in Hz) with which the modules tick function gets called to frequency.
+
 #### write(self, msg, msg_type)
 
 This function will send the `msg` to the server, classyfing it as of type `msg_type`.
@@ -264,7 +265,7 @@ if __name__ == "__main__":
 This is necessary to make the script easily executable.
 
 
-### mockDisplayModule
+### mockDisplayModule.py
 
 ```
 #!/usr/bin/env python3
