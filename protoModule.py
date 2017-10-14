@@ -3,8 +3,8 @@ from robomodules.comm.asyncClient import AsyncClient
 from robomodules.comm.subscribe_pb2 import Subscribe
 
 class ProtoModule:
-    def __init__(self, addr, port, message_buffers, MsgType, frequency=0, subscriptions=[]):
-        self.loop = asyncio.get_event_loop()
+    def __init__(self, addr, port, message_buffers, MsgType, frequency=0, subscriptions=[], loop=None):
+        self.loop = loop or asyncio.get_event_loop()
         self.client = AsyncClient(addr, port, self.msg_received, message_buffers, MsgType, subscriptions, self.loop)
         self.frequency = frequency
         self.loop.call_soon(self._internal_tick)
@@ -32,6 +32,9 @@ class ProtoModule:
 
     def write(self, msg, msg_type):
         self.client.write(msg, msg_type)
+
+    def connect(self):
+        self.client.connect()
     
     def run(self):
         try:

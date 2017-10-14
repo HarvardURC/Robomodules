@@ -30,13 +30,14 @@ This function stops the server.
 
 ### robomodules.ProtoModule
 
-####  __init_\_(self, addr, port, message_buffers, MsgType, frequency=0, subscriptions=[])
+####  __init_\_(self, addr, port, message_buffers, MsgType, frequency=0, subscriptions=[], loop=None)
 
 - addr - The address of the server this module is going to connect to.
 - port - The port of the server this module is going to connect to.
 - message_buffers - message_buffers is a dictionary, where the keys are the various values of the MsgType enum class and the values are the corresponding protocol buffer message classes.
 - frequency (default = `0`) - The frequency with which the classes tick function will get called. If missing or `0`, then tick won't get called automatically.
 - subscriptions (default = `[]`) - List of initial message types that this module will subscribe to. If missing or `[]`, then no message types will be subscribed to.
+- loop (default = None) - The asyncio event loop this module will run on. If None, then will create a new one.
 
 #### tick(self)
 
@@ -65,6 +66,10 @@ Sets the frequency (in Hz) with which the modules tick function gets called to f
 This function will send the `msg` to the server, classyfing it as of type `msg_type`.
 - msg - `msg` has to be serialized into a string. If dealing with a protocol buffer class, then you should call `buffer.SeriaToString()` before passing it in as the msg.
 - msg_type - a value from the `MsgType` enum class.
+
+#### connect(self)
+
+Calling this function will connect the module to the server. If your code has multiple modules running on the same event loop, then you should connect all but one of them and call the `run()` method on the last one.
 
 #### run(self)
 
