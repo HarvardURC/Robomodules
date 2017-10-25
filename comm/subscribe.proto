@@ -1,13 +1,19 @@
 syntax = "proto2";
 
-package mateROV;
+package roboModules;
 
 message Subscribe {
   repeated int32 msg_types = 1;
   required Direction dir = 2;
+  required Protocol protocol = 3;
 
   enum Direction {
     SUBSCRIBE = 0;
     UNSUBSCRIBE = 1;
+  }
+
+  enum Protocol {
+    TCP = 0;
+    UDP = 1;
   }
 }

@@ -1,17 +1,21 @@
 import asyncio
 from robomodules.comm.serverProto import ServerProto
+from robomodules.comm.udpServerProto import UdpServerProto
 from robomodules.comm.subscribe_pb2 import Subscribe
 from robomodules.comm.constants import _SUBSCRIBE
 
 class Server():
-    def __init__(self, addr, port, MsgType):
+    def __init__(self, addr, tcp_port, udp_port, MsgType):
         self.loop = asyncio.get_event_loop()
         self.clients = []
-        self.subs = {}
+        self.tcp_subs = {}
+        self.udp_subs = {}
         self.MsgType = MsgType
 
-        coro = self.loop.create_server(lambda: ServerProto(self), addr, port)
-        self.server = self.loop.run_until_complete(coro)
+        tcp_coro = self.loop.create_server(lambda: ServerProto(self), addr, tcp_port)
+        udp_coro = self.loop.create_datagram_endpoint(lambda: UdpServerProto(self), local_addr=(addr, udp_port))
+        self.tcp_server = self.loop.run_until_complete(tcp_coro)
+        self.udp_server = self.loop.run_until_complete(udp_coro)
 
     def _handle_subscriptions(self, protocol, data):
         if data.dir == Subscribe.SUBSCRIBE:
@@ -22,28 +26,32 @@ class Server():
     def _remove_subscriptions(self, protocol, data):
         for msg_type in data.msg_types:
             m_type = self.MsgType(msg_type)
-            if m_type in self.subs:
-                self.subs[m_type].remove(protocol)
+            subs_arr = self.tcp_subs if data.protocol == Subscribe.TCP else self.udp_subs
+            if m_type in subs_arr:
+                subs_arr[m_type].remove(protocol)
 
     def _add_subscriptions(self, protocol, data):
         for msg_type in data.msg_types:
             m_type = self.MsgType(msg_type)
-            if m_type in self.subs:
-                self.subs[m_type].append(protocol)
+            subs_arr = self.tcp_subs if data.protocol == Subscribe.TCP else self.udp_subs
+            if m_type in subs_arr:
+                subs_arr[m_type].append(protocol)
             else:
-                self.subs[m_type] = [protocol]
+                subs_arr[m_type] = [protocol]
 
     def _forward_msg(self, msg, msg_type):
         m_type = self.MsgType(msg_type)
-        if m_type in self.subs:
-            for protocol in self.subs[m_type]:
-                protocol.write(msg, m_type)
+        for subs in [self.tcp_subs, self.udp_subs]:
+            if m_type in subs:
+                for client in subs[m_type]:
+                    client.write(msg, m_type)
 
     def remove_client(self, protocol):
         self.clients.remove(protocol)
-        for msg_type in self.subs:
-            if protocol in self.subs[msg_type]:
-                self.subs[msg_type].remove(protocol)
+        for subs in [self.tcp_subs, self.udp_subs]:
+            for msg_type in subs:
+                if protocol in subs[msg_type]:
+                    subs[msg_type].remove(protocol)
 
     def msg_received(self, protocol, msg, msg_type):
         if msg_type == _SUBSCRIBE:

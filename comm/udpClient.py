@@ -1,10 +1,10 @@
 import struct, asyncio
 from enum import Enum
-from .asyncProto import AsyncProto
+from .udpProto import UdpProto
 from .subscribe_pb2 import Subscribe
 from .constants import _SUBSCRIBE
 
-class AsyncClient(AsyncProto):
+class UdpClient(UdpProto):
     def __init__(self, addr, port, cb, message_buffers, MsgType, subscriptions, loop=None):
         """
         cb must be a function that takes a single argument and processes it
@@ -23,7 +23,7 @@ class AsyncClient(AsyncProto):
         self.message_buffers = message_buffers
 
     def connect(self):
-        coro = self.loop.create_connection(lambda: self, self.addr, self.port)
+        coro = self.loop.create_datagram_endpoint(lambda: self, remote_addr=(self.addr, self.port))
 
         # this part is a little messy I'm not sure what's up with it
         # I can't promise it works if the loop is already running, which would
@@ -51,7 +51,7 @@ class AsyncClient(AsyncProto):
         for msg_type in msg_types:
             msg.msg_types.append(msg_type.value)
         msg.dir = direction
-        msg.protocol = Subscribe.TCP
+        msg.protocol = Subscribe.UDP
         self.write(msg.SerializeToString(), _SUBSCRIBE)
 
 
